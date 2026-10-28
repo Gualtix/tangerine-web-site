@@ -1,0 +1,324 @@
+<!doctype html>
+<!--
+  Date El Gusto: zero-build landing page + WhatsApp storefront.
+
+  Serve this folder from any static server (python3 -m http.server, npx serve, GitHub Pages, a CDN bucket).
+  Opening index.html straight from disk (file://) will not work: browsers block ES modules there.
+  Every local path is relative, so the folder works at a domain root, in a sub-folder or on GitHub Pages.
+
+  Files: index.html (static landing markup + custom-element tags), styles.css (brand tokens and the few
+  rules utilities cannot express), data.js (business data), js/app.js (the single entry module).
+  Re-skin for another business: edit the copy below, data.js, and the :root token block in styles.css.
+
+  The landing sections are plain semantic HTML so they read and index without JavaScript. Sections marked
+  `hidden` are kept for later; remove the attribute to show them again.
+-->
+<html lang="es" class="scroll-smooth scroll-pt-18 motion-reduce:scroll-auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Date El Gusto — Cocina chapina de familia</title>
+<meta name="description" content="Cocina guatemalteca casera, hecha con cariño. Pide a domicilio, reserva tu mesa o celebra con nuestro servicio de catering.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./styles.css">
+<!-- Installable app (no offline mode): manifest, icons and iOS splash screens from icons/generate.sh; sw.js is
+     registered by js/app.js. The splash list must match the sizes in generate.sh. -->
+<link rel="manifest" href="./manifest.webmanifest">
+<meta name="theme-color" content="#E99B3F">
+<link rel="icon" href="./icons/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="./icons/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="./icons/favicon-16.png" sizes="16x16" type="image/png">
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Date Gusto">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="apple-touch-startup-image" href="./icons/splash/splash-440x956@3x.png" media="(device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="./icons/splash/splash-420x912@3x.png" media="(device-width: 420px) and (device-height: 912px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="./icons/splash/splash-402x874@3x.png" media="(device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="./icons/splash/splash-430x932@3x.png" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="./icons/splash/splash-393x852@3x.png" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="./icons/splash/splash-390x844@3x.png" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="./icons/splash/splash-428x926@3x.png" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="./icons/splash/splash-375x812@3x.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="./icons/splash/splash-414x896@3x.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="./icons/splash/splash-414x896@2x.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="./icons/splash/splash-375x667@2x.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+<!-- Tailwind CSS v4 browser build, pinned (same major/minor as the repo's tailwindcss ^4.1.11). -->
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.1.11"></script>
+<!-- Theme mapping for the CDN build: exposes the styles.css tokens as Tailwind names (bg-tangerine,
+     rounded-card, font-script, ...). Values live in styles.css; only names live here. -->
+<style type="text/tailwindcss">
+  @theme inline {
+    --color-tangerine: var(--tangerine); --color-tangerine-l: var(--tangerine-l); --color-burnt: var(--burnt);
+    --color-mustard: var(--mustard); --color-sage: var(--sage); --color-sage-d: var(--sage-d); --color-burnt-d: var(--burnt-d);
+    --color-ink: var(--ink); --color-muted: var(--muted); --color-line: var(--line);
+    --color-bg: var(--bg); --color-soft: var(--bg-soft); --color-wa: var(--wa);
+    --radius-card: var(--r-s); --radius-frame: var(--r-m); --radius-slab: var(--r-l);
+    --font-sans: var(--sans); --font-script: var(--script);
+  }
+  /* The monolith's breakpoints, in rem like Tailwind's defaults (16px root): */
+  @theme {
+    --breakpoint-xs: 26.25rem;      /* 420px: max-xs:    = max-width 419px */
+    --breakpoint-phone: 35.0625rem; /* 561px: max-phone: = max-width 560px */
+    --breakpoint-nav: 51.3125rem;   /* 821px: nav: desktop nav and two-column splits; max-nav: = max-width 820px */
+    --breakpoint-wide: 61.3125rem;  /* 981px: wide: four catering tiles; max-wide: = max-width 980px */
+  }
+</style>
+<script type="module" src="./js/app.js"></script>
+</head>
+<body class="bg-bg font-sans text-[1.0625rem] leading-[1.65] text-ink antialiased">
+
+<!-- Header: <site-header> adds [data-solid] after scrolling and drives the mobile menu ([data-open] on #links). -->
+<site-header class="contents">
+<header class="group fixed inset-x-0 top-0 z-50 transition-[background-color,box-shadow] duration-300 data-solid:bg-[rgba(254,254,254,.96)] data-solid:shadow-[0_1px_0_var(--line)] data-solid:backdrop-blur-[8px]">
+  <div class="mx-auto flex h-16 w-[min(1180px,100%_-_2*var(--gutter))] items-center justify-between text-white transition-colors duration-300 group-data-solid:text-ink max-nav:gap-2">
+    <a class="flex items-center gap-2 font-script text-[1.6rem] leading-[normal] font-bold no-underline" href="#inicio" aria-label="Date El Gusto, inicio">
+      <svg class="size-7" viewBox="0 0 32 32" aria-hidden="true"><circle class="fill-tangerine" cx="16" cy="18" r="11"/><path class="fill-sage" d="M16 7c0-3 2-5 5-5-1 3-2 5-5 5z"/><path d="M10 15c1-3 4-4 6-4" stroke="#fff" stroke-width="1.6" stroke-linecap="round" fill="none" opacity=".7"/></svg>
+      Date El Gusto
+    </a>
+    <a class="hidden min-h-11 items-center justify-center gap-2 rounded-full border-2 border-transparent bg-tangerine px-[22px] text-[.95rem] leading-[normal] font-semibold text-ink no-underline transition duration-200 hover:-translate-y-0.5 hover:bg-tangerine-l hover:shadow-[0_8px_18px_rgba(0,0,0,.18)] motion-reduce:transition-none max-nav:inline-flex" href="#menu" aria-label="Pedir por WhatsApp"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1.3-3.9A8 8 0 1 1 8 19z"/><path d="M9 9.5c0 3 2.5 5.5 5.5 5.5l1-1.5-2-1-1 .8a4 4 0 0 1-2-2l.8-1-1-2z"/></svg>Pedir</a>
+    <!-- Desktop: inline links. Up to 820px: a panel under the bar, off-screen and invisible until [data-open]. -->
+    <nav class="flex items-center gap-1.5 max-nav:invisible max-nav:fixed max-nav:inset-x-0 max-nav:top-16 max-nav:-translate-y-[120%] max-nav:flex-col max-nav:items-stretch max-nav:gap-0.5 max-nav:bg-white max-nav:px-(--gutter) max-nav:pt-3 max-nav:pb-6 max-nav:text-ink max-nav:shadow-[0_20px_30px_rgba(0,0,0,.15)] max-nav:transition-transform max-nav:duration-300 data-open:visible data-open:translate-y-0" id="links" aria-label="Principal">
+      <a class="rounded-full px-3 py-2.5 text-[.95rem] font-medium no-underline hover:bg-white/18 group-data-solid:hover:bg-soft max-nav:py-3.5" href="#nosotros">Nosotros</a>
+      <a class="rounded-full px-3 py-2.5 text-[.95rem] font-medium no-underline hover:bg-white/18 group-data-solid:hover:bg-soft max-nav:py-3.5" href="#menu">Menú</a>
+      <a class="rounded-full px-3 py-2.5 text-[.95rem] font-medium no-underline hover:bg-white/18 group-data-solid:hover:bg-soft max-nav:py-3.5" href="#contacto">Contacto</a>
+      <a class="ml-1 inline-flex min-h-11 items-center justify-center gap-2 rounded-full border-2 border-transparent bg-tangerine px-3 py-2.5 text-[.95rem] leading-[normal] font-medium text-ink no-underline transition duration-200 hover:-translate-y-0.5 hover:bg-tangerine-l hover:shadow-[0_8px_18px_rgba(0,0,0,.18)] motion-reduce:transition-none max-nav:mx-0 max-nav:mt-2 max-nav:py-3.5" href="#menu"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1.3-3.9A8 8 0 1 1 8 19z"/><path d="M9 9.5c0 3 2.5 5.5 5.5 5.5l1-1.5-2-1-1 .8a4 4 0 0 1-2-2l.8-1-1-2z"/></svg>Pedir por WhatsApp</a>
+      <!-- "Instalar App": renders hidden and shows only on phones and tablets that can install (js/components/pwa.js) -->
+      <app-install class="contents"></app-install>
+      <span class="ml-2 flex gap-2 max-wide:hidden">
+        <a class="grid size-11 place-items-center rounded-full border-[1.5px] border-current transition-colors duration-200 hover:bg-white/18 group-data-solid:hover:bg-soft" href="#contacto" aria-label="Correo"><svg class="size-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></a>
+        <a class="grid size-11 place-items-center rounded-full border-[1.5px] border-current transition-colors duration-200 hover:bg-white/18 group-data-solid:hover:bg-soft" href="#" aria-label="Facebook"><svg class="size-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 8h2V4h-3a4 4 0 0 0-4 4v3H7v4h2v6h4v-6h3l1-4h-4V8z"/></svg></a>
+        <a class="grid size-11 place-items-center rounded-full border-[1.5px] border-current transition-colors duration-200 hover:bg-white/18 group-data-solid:hover:bg-soft" href="#galeria" aria-label="Instagram"><svg class="size-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="5"/><circle cx="12" cy="12" r="3.5"/><circle cx="17" cy="7" r=".6"/></svg></a>
+      </span>
+    </nav>
+    <!-- Burger: three bars drawn with ::before/::after that turn into an X while aria-expanded="true". -->
+    <button class="group/burger hidden size-11 cursor-pointer rounded-full border-[1.5px] border-current max-nav:block" aria-expanded="false" aria-controls="links" aria-label="Abrir menú"><span class="relative mx-auto block h-0.5 w-4.5 bg-current transition-all duration-[250ms] before:absolute before:left-0 before:-top-1.5 before:block before:h-0.5 before:w-4.5 before:bg-current before:transition-all before:duration-[250ms] after:absolute after:left-0 after:top-1.5 after:block after:h-0.5 after:w-4.5 after:bg-current after:transition-all after:duration-[250ms] group-aria-expanded/burger:bg-transparent group-aria-expanded/burger:before:top-0 group-aria-expanded/burger:before:rotate-45 group-aria-expanded/burger:after:top-0 group-aria-expanded/burger:after:-rotate-45"></span></button>
+  </div>
+</header>
+</site-header>
+
+<main>
+<!-- 1. Hero -->
+<section class="relative grid min-h-svh place-items-center bg-cover bg-center px-(--gutter) pt-[110px] pb-[70px] text-center text-white [background-image:linear-gradient(var(--scrim),rgba(20,15,10,.78)),var(--bg-img)]" id="inicio" style="--bg-img:url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1800&q=70')">
+  <div>
+    <h1 class="font-script text-[clamp(3.2rem,12.5vw,9.5rem)] leading-none font-bold [text-shadow:0_4px_30px_rgba(0,0,0,.45)]">Date El Gusto</h1>
+    <p class="mt-2 text-[clamp(.8rem,2.2vw,1.05rem)] font-semibold tracking-[.14em] uppercase">Auténtica cocina chapina de familia</p>
+    <p class="mt-1.5 opacity-90">A domicilio y para llevar · pedidos por WhatsApp</p>
+    <div class="mt-7 flex flex-wrap justify-center gap-3">
+      <a class="inline-flex min-h-[46px] items-center justify-center gap-2 rounded-full border-2 border-transparent bg-tangerine px-[26px] text-[.95rem] leading-[normal] font-semibold text-ink no-underline transition duration-200 hover:-translate-y-0.5 hover:bg-tangerine-l hover:shadow-[0_8px_18px_rgba(0,0,0,.18)] motion-reduce:transition-none" href="#menu"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1.3-3.9A8 8 0 1 1 8 19z"/><path d="M9 9.5c0 3 2.5 5.5 5.5 5.5l1-1.5-2-1-1 .8a4 4 0 0 1-2-2l.8-1-1-2z"/></svg>Pedir por WhatsApp</a>
+    </div>
+  </div>
+</section>
+
+<!-- 11. Almuerzos (moved right below the hero) -->
+<section class="relative py-(--section)">
+  <div class="mx-auto w-[min(1180px,100%_-_2*var(--gutter))]">
+    <div class="rv relative grid grid-cols-1 items-center gap-8 rounded-slab bg-soft p-[clamp(24px,4vw,48px)] nav:grid-cols-[1fr_1.1fr]">
+      <!-- price burst: a star polygon, rotated -->
+      <div class="absolute -top-[22px] right-[clamp(12px,3vw,40px)] grid size-[92px] rotate-[10deg] place-items-center bg-tangerine text-center text-[1.15rem] leading-[1.1] font-extrabold text-ink [clip-path:polygon(50%_0,60%_10%,73%_5%,78%_18%,92%_20%,90%_34%,100%_44%,92%_56%,98%_70%,85%_76%,83%_90%,69%_89%,60%_100%,50%_92%,40%_100%,31%_89%,17%_90%,15%_76%,2%_70%,8%_56%,0_44%,10%_34%,8%_20%,22%_18%,27%_5%,40%_10%)]" aria-label="Precio Q65">Q65<small class="block text-[.6rem] font-semibold">por plato</small></div>
+      <div>
+        <h3 class="mb-3 text-[1.7rem] leading-[1.2] font-extrabold uppercase">¡Almuerzos del día!</h3>
+        <p>Haz una pausa sabrosa a la hora del almuerzo con nuestro menú diario. De 11:00 a 15:00 h. Incluye bebida y postre del día:</p>
+        <ul class="mt-3.5 mb-[22px] *:relative *:pl-[22px] *:before:absolute *:before:top-[.7em] *:before:left-0 *:before:size-2 *:before:rounded-full *:before:bg-tangerine">
+          <li>Pollo en crema</li><li>Pepián de pollo</li><li>Jocón con arroz</li><li>Churrasco chapín</li><li>Chiles rellenos</li>
+        </ul>
+        <a class="inline-flex min-h-[46px] items-center justify-center gap-2 rounded-full border-2 border-transparent bg-ink px-[26px] text-[.95rem] leading-[normal] font-semibold text-white no-underline transition duration-200 hover:-translate-y-0.5 hover:bg-black hover:shadow-[0_8px_18px_rgba(0,0,0,.18)] motion-reduce:transition-none" href="#menu">Ver menú</a>
+      </div>
+      <div class="grid h-[340px] grid-cols-[1.2fr_1fr] grid-rows-2 gap-3 max-nav:h-[260px] *:size-full *:rounded-card *:object-cover">
+        <img class="row-span-2" loading="lazy" width="400" height="340" src="https://images.unsplash.com/photo-1493770348161-369560ae357d?auto=format&fit=crop&w=600&h=700&q=70" alt="Mesa con platillos variados del almuerzo">
+        <img loading="lazy" width="300" height="160" src="https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=500&h=330&q=70" alt="Plato con ejotes, arroz y vegetales">
+        <img loading="lazy" width="300" height="160" src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=500&h=330&q=70" alt="Bowl con proteína y vegetales frescos">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 2. Marquee: <dish-marquee> duplicates the track; it pauses on hover and stops under reduced motion. -->
+<dish-marquee class="group block overflow-hidden bg-bg pt-7 pb-2" aria-label="Platillos destacados">
+  <div class="flex w-max animate-[marquee_40s_linear_infinite] gap-5 group-hover:[animation-play-state:paused] motion-reduce:animate-none *:w-[150px] *:text-center *:text-[.8rem] *:font-medium *:text-muted [&_img]:mb-2 [&_img]:h-[110px] [&_img]:w-[150px] [&_img]:rounded-card [&_img]:object-cover">
+    <!-- se duplica con JS -->
+    <div><img loading="lazy" width="150" height="110" src="https://images.unsplash.com/photo-1529042410759-befb1204b468?auto=format&fit=crop&w=300&h=220&q=70" alt="Albóndigas en salsa sobre hojas verdes">Albóndigas en salsa</div>
+    <div><img loading="lazy" width="150" height="110" src="https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=300&h=220&q=70" alt="Costillas BBQ con vegetales">Costillas BBQ</div>
+    <div><img loading="lazy" width="150" height="110" src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=300&h=220&q=70" alt="Pinchos mixtos a la parrilla">Pinchos mixtos</div>
+    <div><img loading="lazy" width="150" height="110" src="https://images.unsplash.com/photo-1600891964092-4316c288032e?auto=format&fit=crop&w=300&h=220&q=70" alt="Churrasco con papas fritas">Churrasco chapín</div>
+    <div><img loading="lazy" width="150" height="110" src="https://images.unsplash.com/photo-1432139555190-58524dae6a55?auto=format&fit=crop&w=300&h=220&q=70" alt="Lomo de cerdo con piña">Cerdo con piña</div>
+    <div><img loading="lazy" width="150" height="110" src="https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=300&h=220&q=70" alt="Filete de salmón con limón">Salmón al limón</div>
+    <div><img loading="lazy" width="150" height="110" src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=300&h=220&q=70" alt="Ensalada fresca con aguacate">Ensalada de la casa</div>
+    <div><img loading="lazy" width="150" height="110" src="https://images.unsplash.com/photo-1565958011703-44f9829ba187?auto=format&fit=crop&w=300&h=220&q=70" alt="Pastel de frambuesa">Pastel de frutos rojos</div>
+  </div>
+</dish-marquee>
+
+<!-- 3. Value strip: three columns with dividers on desktop, stacked with top rules up to 820px -->
+<div class="bg-soft py-10">
+  <div class="mx-auto grid w-[min(1180px,100%_-_2*var(--gutter))] grid-cols-1 gap-[18px] nav:grid-cols-3 nav:gap-0 [&_h3]:text-base [&_h3]:font-bold [&_p]:mt-1 [&_p]:text-[.92rem] [&_p]:text-muted">
+    <div class="rv px-7 py-2 text-center"><div class="mx-auto mb-2.5 grid size-12 place-items-center rounded-full bg-tangerine"><svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M7 12a5 5 0 0 1 10 0M4 12v2a4 4 0 0 0 4 4h8a4 4 0 0 0 4-4v-2"/></svg></div><h3>Sabores auténticos</h3><p>Recetas de abuela, con ingredientes frescos de mercados locales.</p></div>
+    <div class="rv border-[#d6d2ca] px-7 py-2 text-center max-nav:border-t max-nav:pt-[22px] nav:border-l"><div class="mx-auto mb-2.5 grid size-12 place-items-center rounded-full bg-mustard"><svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.600-7 10-7 10z"/></svg></div><h3>Hecho en casa</h3><p>Todo se cocina cada mañana, despacio y con mucho cariño.</p></div>
+    <div class="rv border-[#d6d2ca] px-7 py-2 text-center max-nav:border-t max-nav:pt-[22px] nav:border-l"><div class="mx-auto mb-2.5 grid size-12 place-items-center rounded-full bg-sage"><svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 19c0-3 3-5 6-5s6 2 6 5M15 14c3 0 6 1.500 6 5"/></svg></div><h3>Ambiente familiar</h3><p>Una mesa grande donde todos son bienvenidos, como en casa.</p></div>
+  </div>
+</div>
+
+<!-- 4. Nosotros. Split layout: text + photo on a coloured slab (before:), stacked up to 820px. -->
+<section class="relative py-(--section)" id="nosotros">
+  <div class="mx-auto grid w-[min(1180px,100%_-_2*var(--gutter))] grid-cols-1 items-center gap-[clamp(32px,6vw,80px)] nav:grid-cols-2">
+    <div class="rv">
+      <h2 class="relative mb-5 inline-block pb-3 font-script text-[clamp(2.2rem,5vw,3rem)] leading-[1.15] font-bold after:absolute after:bottom-0 after:left-0 after:h-1 after:w-16 after:rounded after:bg-sage">Bienvenidos</h2>
+      <p>Bienvenidos a nuestro restaurante familiar de cocina guatemalteca, donde te invitamos a saborear los sabores más cálidos de nuestra tierra. Nuestro compromiso con la calidad y la tradición hace que cada plato esté preparado con esmero, con recetas de toda la vida e ingredientes frescos.</p>
+      <p class="mt-[1em]">Acompáñanos a celebrar la calidez de la familia, la riqueza de la cultura y el placer de la comida chapina.</p>
+      <p class="mt-[22px]"><a class="inline-flex min-h-[46px] items-center justify-center gap-2 rounded-full border-2 border-transparent bg-ink px-[26px] text-[.95rem] leading-[normal] font-semibold text-white no-underline transition duration-200 hover:-translate-y-0.5 hover:bg-black hover:shadow-[0_8px_18px_rgba(0,0,0,.18)] motion-reduce:transition-none" href="#nosotros-historia">Nuestra historia</a></p>
+      <svg class="pointer-events-none absolute mt-[18px] w-[110px] opacity-55" viewBox="0 0 100 100" fill="none" stroke="#bdbab4" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 70c10-40 40-55 70-50-5 35-35 60-70 50zM20 70C35 55 55 40 80 28"/></svg>
+    </div>
+    <div class="rv relative isolate before:absolute before:inset-[-24px_-24px_28px_28px] before:-z-1 before:rounded-tr-slab before:bg-sage max-nav:before:inset-[-14px_-14px_22px_22px]" id="nosotros-historia">
+      <img class="aspect-[4/3] w-full rounded-frame object-cover" loading="lazy" width="800" height="600" src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=900&h=675&q=70" alt="Interior cálido del restaurante con mesas de madera">
+    </div>
+  </div>
+</section>
+
+<!-- 5. Sabores (mirrored split: photo first, slab on the left) -->
+<section class="relative pb-(--section)">
+  <div class="mx-auto grid w-[min(1180px,100%_-_2*var(--gutter))] grid-cols-1 items-center gap-[clamp(32px,6vw,80px)] nav:grid-cols-2">
+    <div class="rv relative isolate before:absolute before:inset-[-24px_28px_28px_-24px] before:-z-1 before:rounded-tl-slab before:bg-mustard max-nav:before:inset-[-14px_22px_22px_-14px]">
+      <img class="aspect-[4/3] w-full rounded-frame object-cover" loading="lazy" width="800" height="600" src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=900&h=675&q=70" alt="Parrillada de carnes y verduras asadas">
+    </div>
+    <div class="rv">
+      <h2 class="relative mb-5 inline-block pb-3 font-script text-[clamp(2.2rem,5vw,3rem)] leading-[1.15] font-bold after:absolute after:bottom-0 after:left-0 after:h-1 after:w-16 after:rounded after:bg-sage">Sabores de Guatemala</h2>
+      <p>Nos enorgullece preparar los platillos vibrantes y diversos de nuestras tradiciones culinarias. Cada bocado es un viaje al corazón de Guatemala: caldos humeantes, carnes a las brasas, salsas de recado y tortillas recién hechas.</p>
+      <p class="mt-[1em]">Ven a disfrutar estos sabores de siempre, servidos como se merecen: a tu mesa.</p>
+      <p class="mt-[22px]"><a class="inline-flex min-h-[46px] items-center justify-center gap-2 rounded-full border-2 border-transparent bg-tangerine px-[26px] text-[.95rem] leading-[normal] font-semibold text-ink no-underline transition duration-200 hover:-translate-y-0.5 hover:bg-tangerine-l hover:shadow-[0_8px_18px_rgba(0,0,0,.18)] motion-reduce:transition-none" href="#menu">Ver menú</a></p>
+      <svg class="pointer-events-none absolute mt-[18px] w-[110px] opacity-55" viewBox="0 0 100 100" fill="none" stroke="#bdbab4" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M50 40c-14 0-22 12-22 26s8 26 22 26 22-12 22-26-8-26-22-26zM50 40c-4-10-2-18 8-24M50 40c-8-6-18-6-24 2M50 40c6-6 16-6 22 0M36 58l28 20M64 58L36 78"/></svg>
+    </div>
+  </div>
+</section>
+
+<!-- 6. Menú: <menu-catalog> renders the products from data.js -->
+<section class="relative pb-(--section)" id="menu">
+  <div class="mx-auto w-[min(1180px,100%_-_2*var(--gutter))]">
+    <div class="mb-3 flex flex-wrap items-end justify-between gap-3">
+      <h2 class="relative mb-5 inline-block pb-3 font-script text-[clamp(2.2rem,5vw,3rem)] leading-[1.15] font-bold after:absolute after:bottom-0 after:left-0 after:h-1 after:w-16 after:rounded after:bg-sage">Nuestro menú</h2>
+    </div>
+    <menu-catalog class="block"></menu-catalog>
+  </div>
+</section>
+
+<!-- 7. Reserva (hidden for now; remove `hidden` to show it again). <reserve-form> is a front-end demo only. -->
+<div class="grid place-items-center bg-cover bg-center py-[clamp(80px,12vw,140px)] [background-image:linear-gradient(var(--scrim),var(--scrim)),var(--bg-img)]" id="reservas" hidden style="--bg-img:url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1600&q=60')">
+  <reserve-form class="contents">
+  <form class="w-[min(360px,100%_-_2*var(--gutter))] rounded-card bg-white p-6 text-left shadow-[0_20px_50px_rgba(0,0,0,.35)]" novalidate>
+    <h3 class="mb-3.5 text-[1.05rem] font-bold">Reserva tu mesa</h3>
+    <label class="mb-2.5 block"><span class="mb-1 block text-[.8rem] font-semibold">Fecha</span><input class="min-h-[46px] w-full rounded-xl border-[1.5px] border-line bg-white px-3.5 text-ink focus:border-ink focus:ring-3 focus:ring-tangerine/50 focus:outline-none" type="date" name="date" required></label>
+    <label class="mb-2.5 block"><span class="mb-1 block text-[.8rem] font-semibold">Hora</span>
+      <select class="min-h-[46px] w-full rounded-xl border-[1.5px] border-line bg-white px-3.5 text-ink focus:border-ink focus:ring-3 focus:ring-tangerine/50 focus:outline-none" name="time"><option>12:00</option><option>13:00</option><option selected>19:00</option><option>20:00</option><option>21:00</option></select></label>
+    <label class="mb-2.5 block"><span class="mb-1 block text-[.8rem] font-semibold">Personas</span>
+      <select class="min-h-[46px] w-full rounded-xl border-[1.5px] border-line bg-white px-3.5 text-ink focus:border-ink focus:ring-3 focus:ring-tangerine/50 focus:outline-none" name="people"><option>1 persona</option><option selected>2 personas</option><option>3 personas</option><option>4 personas</option><option>5 personas</option><option>6 o más</option></select></label>
+    <button class="mt-1.5 inline-flex min-h-[46px] w-full cursor-pointer items-center justify-center gap-2 rounded-full border-2 border-transparent bg-burnt-d px-[26px] text-[.95rem] leading-[normal] font-semibold text-white transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_18px_rgba(0,0,0,.18)] motion-reduce:transition-none" type="submit">Buscar mesa</button>
+    <p class="mt-3 min-h-[1.4em] text-[.92rem] font-semibold text-sage-d data-error:text-burnt-d" role="status" aria-live="polite"></p>
+  </form>
+  </reserve-form>
+</div>
+
+<!-- 8. Galería: masonry grid, 3 columns on desktop and 2 up to 820px -->
+<section class="relative py-(--section)" id="galeria">
+  <div class="mx-auto w-[min(1180px,100%_-_2*var(--gutter))]">
+    <div class="mb-3 flex flex-wrap items-end justify-between gap-3">
+      <h2 class="relative mb-5 inline-block pb-3 font-script text-[clamp(2.2rem,5vw,3rem)] leading-[1.15] font-bold after:absolute after:bottom-0 after:left-0 after:h-1 after:w-16 after:rounded after:bg-sage">Nuestros platillos</h2>
+      <a class="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border-2 border-transparent bg-ink px-[22px] text-[.95rem] leading-[normal] font-semibold text-white no-underline transition duration-200 hover:-translate-y-0.5 hover:bg-black hover:shadow-[0_8px_18px_rgba(0,0,0,.18)] motion-reduce:transition-none" href="#">Ver Instagram</a>
+    </div>
+    <div class="rv mt-7 grid auto-rows-[170px] grid-cols-2 gap-4 nav:auto-rows-[210px] nav:grid-cols-3 *:overflow-hidden *:rounded-card [&_img]:size-full [&_img]:rounded-card [&_img]:object-cover [&_img]:transition-transform [&_img]:duration-[400ms] [&_img:hover]:scale-105">
+      <figure><img loading="lazy" width="500" height="300" src="https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=600&h=400&q=70" alt="Salmón a la plancha"></figure>
+      <figure class="row-span-2"><img loading="lazy" width="500" height="500" src="https://images.unsplash.com/photo-1432139555190-58524dae6a55?auto=format&fit=crop&w=600&h=800&q=70" alt="Cerdo asado con piña"></figure>
+      <figure><img loading="lazy" width="500" height="300" src="https://images.unsplash.com/photo-1476224203421-9ac39bcb3327?auto=format&fit=crop&w=600&h=400&q=70" alt="Pollo asado con ensalada"></figure>
+      <figure class="row-span-2"><img loading="lazy" width="500" height="500" src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=600&h=800&q=70" alt="Pinchos a la parrilla"></figure>
+      <figure><img loading="lazy" width="500" height="300" src="https://images.unsplash.com/photo-1529042410759-befb1204b468?auto=format&fit=crop&w=600&h=400&q=70" alt="Albóndigas con salsa"></figure>
+      <figure><img loading="lazy" width="500" height="300" src="https://images.unsplash.com/photo-1600891964092-4316c288032e?auto=format&fit=crop&w=600&h=400&q=70" alt="Churrasco con papas"></figure>
+    </div>
+  </div>
+</section>
+
+<!-- 9. Testimonios (hidden for now; remove `hidden` to show it again). Cards: 3 per view, 2 up to 980px, 88% up to 560px. -->
+<section class="relative pb-(--section)" hidden>
+  <div class="mx-auto w-[min(1180px,100%_-_2*var(--gutter))] text-center">
+    <h2 class="relative mb-5 inline-block pb-3 font-script text-[clamp(2.2rem,5vw,3rem)] leading-[1.15] font-bold after:absolute after:bottom-0 after:left-1/2 after:h-1 after:w-16 after:-translate-x-1/2 after:rounded after:bg-sage">Testimonios</h2>
+    <review-carousel class="relative mt-7 block">
+      <div class="flex snap-x snap-mandatory gap-5 overflow-x-auto px-0.5 py-1.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden *:shrink-0 *:grow-0 *:basis-[calc((100%_-_40px)/3)] *:snap-start *:rounded-frame *:border-[1.5px] *:border-line *:bg-white *:p-7 max-wide:*:basis-[calc((100%_-_20px)/2)] max-phone:*:basis-[88%]" data-slides tabindex="0" aria-label="Opiniones de clientes">
+        <figure><div class="text-[1.2rem] tracking-[3px] text-tangerine" aria-label="5 de 5 estrellas">★★★★★</div><p class="mt-3 mb-[18px] text-[.98rem]">“Sabor increíble y de verdad casero. El pepián me recordó a la cocina de mi abuela. ¡Totalmente recomendado!”</p><div class="flex items-center gap-3"><i class="grid size-11 place-items-center rounded-full bg-mustard text-base font-bold not-italic text-ink">PM</i><div><b class="block text-[.95rem]">Patricia Méndez</b><small class="text-muted">Reseña de Google</small></div></div></figure>
+        <figure><div class="text-[1.2rem] tracking-[3px] text-tangerine" aria-label="5 de 5 estrellas">★★★★★</div><p class="mt-3 mb-[18px] text-[.98rem]">“Deliciosa y sabrosa. Soy muy exigente con la comida chapina y aquí me sentí como en casa. ¡Los volveré a visitar!”</p><div class="flex items-center gap-3"><i class="grid size-11 place-items-center rounded-full bg-sage text-base font-bold not-italic text-ink">AC</i><div><b class="block text-[.95rem]">Ana Castillo</b><small class="text-muted">Reseña de Google</small></div></div></figure>
+        <figure><div class="text-[1.2rem] tracking-[3px] text-tangerine" aria-label="5 de 5 estrellas">★★★★★</div><p class="mt-3 mb-[18px] text-[.98rem]">“Mi lugar favorito para almorzar con mis compañeros. Porciones generosas, buen precio y el personal es muy amable.”</p><div class="flex items-center gap-3"><i class="grid size-11 place-items-center rounded-full bg-tangerine text-base font-bold not-italic text-ink">CT</i><div><b class="block text-[.95rem]">Carlos Tún</b><small class="text-muted">Reseña de Google</small></div></div></figure>
+        <figure><div class="text-[1.2rem] tracking-[3px] text-tangerine" aria-label="5 de 5 estrellas">★★★★★</div><p class="mt-3 mb-[18px] text-[.98rem]">“Pedimos el catering para el cumpleaños de mi mamá y todos quedaron felices. Puntuales y todo riquísimo.”</p><div class="flex items-center gap-3"><i class="grid size-11 place-items-center rounded-full bg-mustard text-base font-bold not-italic text-ink">LR</i><div><b class="block text-[.95rem]">Lucía Ramírez</b><small class="text-muted">Reseña de Facebook</small></div></div></figure>
+        <figure><div class="text-[1.2rem] tracking-[3px] text-tangerine" aria-label="4 de 5 estrellas">★★★★☆</div><p class="mt-3 mb-[18px] text-[.98rem]">“El ambiente es súper acogedor y los postres son un sueño. Volveremos pronto con toda la familia.”</p><div class="flex items-center gap-3"><i class="grid size-11 place-items-center rounded-full bg-sage text-base font-bold not-italic text-ink">JG</i><div><b class="block text-[.95rem]">Jorge Girón</b><small class="text-muted">Reseña de Google</small></div></div></figure>
+      </div>
+      <div class="mt-5 flex justify-center gap-3 *:size-11 *:cursor-pointer *:rounded-full *:border-[1.5px] *:border-ink *:bg-white *:text-[1.2rem] *:transition-colors *:duration-200 *:hover:bg-tangerine">
+        <button type="button" data-prev aria-label="Opinión anterior">‹</button>
+        <button type="button" data-next aria-label="Opinión siguiente">›</button>
+      </div>
+    </review-carousel>
+  </div>
+</section>
+
+<!-- 10. Pedir en línea -->
+<div class="grid place-items-center bg-cover bg-center py-[clamp(80px,12vw,140px)] [background-image:linear-gradient(var(--scrim),var(--scrim)),var(--bg-img)]" id="pedir" style="--bg-img:url('https://images.unsplash.com/photo-1600891964092-4316c288032e?auto=format&fit=crop&w=1600&q=60')">
+  <div class="w-[min(360px,100%_-_2*var(--gutter))] rounded-card bg-white p-6 text-center shadow-[0_20px_50px_rgba(0,0,0,.35)]">
+    <h3 class="mb-1.5 font-script text-[2rem] leading-[normal] font-bold">Pide por WhatsApp</h3>
+    <p class="mb-3.5 text-[.95rem] text-muted">Elige tus platillos, personalízalos y envíanos tu pedido por WhatsApp. Ahí coordinamos pago y entrega.</p>
+    <a class="inline-flex min-h-[46px] items-center justify-center gap-2 rounded-full border-2 border-transparent bg-tangerine px-[26px] text-[.95rem] leading-[normal] font-semibold text-ink no-underline transition duration-200 hover:-translate-y-0.5 hover:bg-tangerine-l hover:shadow-[0_8px_18px_rgba(0,0,0,.18)] motion-reduce:transition-none" href="#menu"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1.3-3.9A8 8 0 1 1 8 19z"/><path d="M9 9.5c0 3 2.5 5.5 5.5 5.5l1-1.5-2-1-1 .8a4 4 0 0 1-2-2l.8-1-1-2z"/></svg>Elegir platillos</a>
+  </div>
+</div>
+
+<!-- 12. Catering (hidden for now; remove `hidden` to show it again). Tiles: 4 columns from 981px, 2 below. -->
+<section class="relative pb-(--section)" hidden>
+  <div class="mx-auto w-[min(1180px,100%_-_2*var(--gutter))] text-center">
+    <h2 class="relative mb-5 inline-block pb-3 font-script text-[clamp(2.2rem,5vw,3rem)] leading-[1.15] font-bold after:absolute after:bottom-0 after:left-1/2 after:h-1 after:w-16 after:-translate-x-1/2 after:rounded after:bg-sage">Servicio de catering</h2>
+    <p class="mx-auto max-w-[60ch] text-muted">Convierte tus eventos en experiencias culinarias inolvidables. <a class="font-semibold text-burnt-d underline" href="mailto:hola@dateelgusto.example">Escríbenos</a> para recibir una cotización.</p>
+    <div class="rv mt-7 grid grid-cols-2 gap-4 max-phone:gap-2.5 wide:grid-cols-4 *:relative *:aspect-[4/5] *:overflow-hidden *:rounded-card [&_img]:size-full [&_img]:object-cover [&_img]:transition-transform [&_img]:duration-[400ms] [&_b]:absolute [&_b]:inset-x-0 [&_b]:bottom-0 [&_b]:px-4 [&_b]:pt-9 [&_b]:pb-3.5 [&_b]:font-bold [&_b]:text-white [&_b]:[background:linear-gradient(transparent,rgba(0,0,0,.72))]">
+      <div class="group"><img class="group-hover:scale-[1.06]" loading="lazy" width="300" height="375" src="https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=500&h=625&q=70" alt="Equipo almorzando en una mesa grande"><b>Empresariales</b></div>
+      <div class="group"><img class="group-hover:scale-[1.06]" loading="lazy" width="300" height="375" src="https://images.unsplash.com/photo-1565958011703-44f9829ba187?auto=format&fit=crop&w=500&h=625&q=70" alt="Rebanada de pastel con frambuesas"><b>Cumpleaños</b></div>
+      <div class="group"><img class="group-hover:scale-[1.06]" loading="lazy" width="300" height="375" src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=500&h=625&q=70" alt="Mesa decorada con flores y copas"><b>Bodas</b></div>
+      <div class="group"><img class="group-hover:scale-[1.06]" loading="lazy" width="300" height="375" src="https://images.unsplash.com/photo-1530062845289-9109b2c9c868?auto=format&fit=crop&w=500&h=625&q=70" alt="Mesa de tapas y vino al aire libre"><b>Reuniones</b></div>
+    </div>
+  </div>
+</section>
+
+<!-- 13. Visítanos -->
+<section class="relative pb-(--section)" id="contacto">
+  <div class="mx-auto grid w-[min(1180px,100%_-_2*var(--gutter))] grid-cols-1 items-center gap-[clamp(32px,6vw,80px)] nav:grid-cols-2">
+    <div class="rv relative isolate before:absolute before:inset-[-24px_-24px_28px_28px] before:-z-1 before:rounded-tr-slab before:bg-burnt max-nav:before:inset-[-14px_-14px_22px_22px]">
+      <img class="aspect-[4/3] w-full rounded-frame object-cover" loading="lazy" width="800" height="600" src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=900&h=675&q=70" alt="Ensalada colorida con aguacate y garbanzos">
+    </div>
+    <div class="rv">
+      <h2 class="relative mb-5 inline-block pb-3 font-script text-[clamp(2.2rem,5vw,3rem)] leading-[1.15] font-bold after:absolute after:bottom-0 after:left-0 after:h-1 after:w-16 after:rounded after:bg-sage">Visítanos</h2>
+      <address class="mb-4 text-muted not-italic">Ciudad Vieja, Sacatepéquez, Guatemala<br>Tel. <a class="underline" href="tel:+50245393659">+502 4539 3659</a></address>
+      <table class="mt-2 mb-[22px] w-full border-collapse [&_td]:border-b [&_td]:border-line [&_td]:py-[9px] [&_td]:text-right [&_td]:text-[.95rem] [&_td]:font-medium [&_th]:border-b [&_th]:border-line [&_th]:py-[9px] [&_th]:text-left [&_th]:text-[.95rem] [&_th]:font-semibold">
+        <caption class="sr-only">Horario de atención</caption>
+        <tr><th>Lunes</th><td class="font-bold! text-burnt-d">Cerrado</td></tr>
+        <tr><th>Martes</th><td>11:00 - 21:00</td></tr>
+        <tr><th>Miércoles</th><td>11:00 - 21:00</td></tr>
+        <tr><th>Jueves</th><td>11:00 - 21:00</td></tr>
+        <tr><th>Viernes</th><td>11:00 - 22:00</td></tr>
+        <tr><th>Sábado</th><td>11:00 - 22:00</td></tr>
+        <tr><th>Domingo</th><td>11:00 - 20:00</td></tr>
+      </table>
+      <a class="inline-flex min-h-[46px] items-center justify-center gap-2 rounded-full border-2 border-transparent bg-tangerine px-[26px] text-[.95rem] leading-[normal] font-semibold text-ink no-underline transition duration-200 hover:-translate-y-0.5 hover:bg-tangerine-l hover:shadow-[0_8px_18px_rgba(0,0,0,.18)] motion-reduce:transition-none" href="#menu"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1.3-3.9A8 8 0 1 1 8 19z"/><path d="M9 9.5c0 3 2.5 5.5 5.5 5.5l1-1.5-2-1-1 .8a4 4 0 0 1-2-2l.8-1-1-2z"/></svg>Pedir por WhatsApp</a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="bg-black pt-11 pb-7 text-white">
+  <div class="mx-auto w-[min(1180px,100%_-_2*var(--gutter))]">
+    <div class="flex flex-wrap items-center justify-between gap-5">
+      <a class="flex items-center gap-2 font-script text-[1.6rem] leading-[normal] font-bold text-white no-underline" href="#inicio"><svg class="size-7" viewBox="0 0 32 32" aria-hidden="true"><circle class="fill-tangerine" cx="16" cy="18" r="11"/><path class="fill-sage" d="M16 7c0-3 2-5 5-5-1 3-2 5-5 5z"/></svg>Date El Gusto</a>
+      <nav class="flex flex-wrap gap-1 *:px-3 *:py-2.5 *:text-[.92rem] *:no-underline *:hover:text-tangerine" aria-label="Pie de página"><a href="#nosotros">Nosotros</a><a href="#menu">Menú</a><a href="#contacto">Contacto</a><a href="#pedir">Pedir en línea</a></nav>
+    </div>
+    <p class="mt-3.5 text-[.88rem] text-[#bbb]">Ciudad Vieja, Sacatepéquez, Guatemala · +502 4539 3659</p>
+    <div class="mt-[22px] flex flex-wrap justify-between gap-3 border-t border-[#333] pt-[22px] text-[.82rem] text-[#999]"><span>© 2026 Date El Gusto Restaurante Familiar</span><span>Prototipo con contenido ficticio</span></div>
+  </div>
+</footer>
+
+<!-- Storefront: dialogs and the cart bar render from data.js (js/components/menu.js and order.js). -->
+<product-dialog></product-dialog>
+<cart-dialog></cart-dialog>
+<cart-bar></cart-bar>
+<offline-notice></offline-notice>
+</body>
+</html>

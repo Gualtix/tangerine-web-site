@@ -1,0 +1,58 @@
+<!doctype html>
+<!--
+  Offline page: sw.js precaches it and serves it when a page load fails without a connection.
+  Fully self-contained (inline CSS and SVG, system fonts, no requests), because nothing else is cached.
+  The copy matches offlineTitle / offlineBody / retry / offlineAuto in data.js; this page cannot load that file.
+  Colours repeat the styles.css tokens. Reloads itself as soon as the connection comes back.
+-->
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#E99B3F">
+<meta name="robots" content="noindex">
+<!-- favicon inlined: offline, a file request (even the automatic /favicon.ico) would fail -->
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><rect width='100%' height='100%' rx='7.04' fill='%23E99B3F'/><svg width='100%' height='100%' viewBox='-2.25 -2.25 36.5 36.5'><circle cx='16' cy='18' r='11' fill='%23fff'/><path d='M16 7c0-3 2-5 5-5-1 3-2 5-5 5z' fill='%23fff'/><path d='M10 15c1-3 4-4 6-4' stroke='%23E99B3F' stroke-width='1.8' stroke-linecap='round' fill='none'/></svg></svg>">
+<title>Sin conexión · Date Gusto</title>
+<style>
+  :root { --tangerine: #E99B3F; --tangerine-l: #f0a955; --ink: #1c1a17; --muted: #5d574f; --bg: #FEFEFE; }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { height: 100%; }
+  body {
+    display: grid; place-items: center; background: var(--bg); color: var(--ink);
+    font: 17px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; -webkit-font-smoothing: antialiased;
+    padding: max(24px, env(safe-area-inset-top)) clamp(16px, 6vw, 48px) max(24px, env(safe-area-inset-bottom));
+  }
+  main { max-width: 24rem; text-align: center; }
+  .tile { position: relative; display: grid; place-items: center; width: 96px; height: 96px; margin: 0 auto 24px; border-radius: 26px; background: var(--tangerine); }
+  .tile > svg { width: 60px; height: 60px; }
+  .badge { position: absolute; right: -8px; bottom: -8px; display: grid; place-items: center; width: 40px; height: 40px; border: 4px solid var(--bg); border-radius: 50%; background: var(--ink); color: #fff; }
+  .badge svg { width: 20px; height: 20px; }
+  h1 { font-size: 1.6rem; line-height: 1.2; font-weight: 800; }
+  p { margin-top: 12px; color: var(--muted); }
+  button {
+    display: inline-flex; align-items: center; justify-content: center; width: 100%; max-width: 16rem; min-height: 52px; margin-top: 28px;
+    border: 0; border-radius: 999px; background: var(--tangerine); color: var(--ink); font: inherit; font-size: 1rem; font-weight: 600; line-height: 1.2; cursor: pointer;
+    transition: scale .15s, filter .15s;
+  }
+  button:hover { filter: brightness(1.06); }
+  button:active { scale: .97; }
+  button:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+  small { display: block; margin-top: 16px; font-size: .85rem; color: var(--muted); }
+  @media (prefers-reduced-motion: reduce) { button { transition: none; } }
+</style>
+</head>
+<body>
+<main>
+  <div class="tile">
+    <svg viewBox="5 1.5 22 28" aria-hidden="true"><circle cx="16" cy="18" r="11" fill="#fff"/><path d="M16 7c0-3 2-5 5-5-1 3-2 5-5 5z" fill="#fff"/><path d="M10 15c1-3 4-4 6-4" stroke="#E99B3F" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg>
+    <span class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M2 8.5a15 15 0 0 1 20 0M5.5 12a10 10 0 0 1 13 0M9 15.5a5 5 0 0 1 6 0"/><circle cx="12" cy="19" r=".8" fill="currentColor"/><path d="M3 3l18 18"/></svg></span>
+  </div>
+  <h1>Sin conexión a internet</h1>
+  <p>Date Gusto necesita una conexión activa a internet y no se puede usar sin conexión: aquí ves el menú y envías tu pedido por WhatsApp.</p>
+  <button type="button" onclick="location.reload()">Reintentar</button>
+  <small>La página se recupera sola cuando vuelva la conexión.</small>
+</main>
+<script>addEventListener('online', () => location.reload());</script>
+</body>
+</html>

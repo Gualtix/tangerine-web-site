@@ -1,0 +1,44 @@
+/*
+ * Custom CSS the Tailwind utilities cannot express. Everything else lives as utility classes in
+ * index.html and the component templates.
+ *
+ * Cascade note: this file is unlayered, so its rules beat Tailwind's layered utilities. Only
+ * state classes the markup opts into (.rv, .sf-pin) live here unlayered; the global focus ring
+ * sits in @layer base so utilities such as rounded-full still win over it.
+ */
+
+/* Brand tokens: the one place to re-skin colours, radii, fonts and rhythm. index.html maps them
+   onto Tailwind theme names (bg-tangerine, rounded-card, font-script, ...). */
+:root {
+  --tangerine: #E99B3F; --tangerine-l: #f0a955; --burnt: #E3793F; --mustard: #F1C964; --sage: #99BD76;
+  --sage-d: #5f8446; --burnt-d: #B8531B;
+  --ink: #1c1a17; --muted: #5d574f; --line: #e6e1d9;
+  --bg: #FEFEFE; --bg-soft: #F1F1F1; --scrim: rgba(20, 15, 10, .62);
+  --wa: #0d7a4a; /* WhatsApp green for order actions; was STOREFRONT_CONFIG.theme.wa */
+  --r-s: 20px; --r-m: 30px; --r-l: 40px;
+  --script: "Dancing Script", cursive; --sans: "Figtree", system-ui, sans-serif;
+  --gutter: clamp(16px, 4vw, 48px); --section: clamp(64px, 9vw, 120px);
+}
+
+/* Global keyboard focus ring for every focusable element (a base rule, not a per-element utility). */
+@layer base {
+  :focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; border-radius: 6px; }
+}
+
+/* Dish marquee: the track holds its items twice, so sliding by half (plus half the 20px gap) loops seamlessly. */
+@keyframes marquee { to { transform: translateX(calc(-50% - 10px)); } }
+
+/* Scroll reveal: .rv starts hidden and offset; js/components/site.js adds .in once it scrolls into view. */
+.rv { opacity: 0; transform: translateY(24px); transition: opacity .7s, transform .7s; }
+.rv.in { opacity: 1; transform: none; }
+
+/* Leaflet delivery pin (L.divIcon className "sf-pin"): a rotated teardrop with a white dot, drawn in CSS
+   because Leaflet owns this element's markup and inline styles. */
+.sf-pin::before { content: ""; position: absolute; left: 8px; top: 4px; width: 28px; height: 28px; border-radius: 50% 50% 50% 0; background: var(--wa); border: 3px solid #fff; box-shadow: 0 2px 6px rgba(0, 0, 0, .4); transform: rotate(-45deg); }
+.sf-pin::after { content: ""; position: absolute; left: 19px; top: 15px; width: 6px; height: 6px; border-radius: 50%; background: #fff; }
+
+/* Reduced motion: reveal content immediately. The marquee, smooth scroll and button transitions
+   opt out through motion-reduce: utilities in the markup. */
+@media (prefers-reduced-motion: reduce) {
+  .rv { opacity: 1; transform: none; transition: none; }
+}

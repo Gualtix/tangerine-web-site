@@ -1,0 +1,25 @@
+{
+  "id": "./",
+  "name": "Date Gusto",
+  "short_name": "Date Gusto",
+  "description": "Cocina chapina de familia: mira el menú y pide a domicilio por WhatsApp.",
+  "lang": "es",
+  "dir": "ltr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#E99B3F",
+  "background_color": "#E99B3F",
+  "categories": ["food"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "screenshots": [
+    { "src": "icons/screenshot-narrow.jpg", "sizes": "780x1688", "type": "image/jpeg", "form_factor": "narrow", "label": "Inicio de Date Gusto en el teléfono" },
+    { "src": "icons/screenshot-wide.jpg", "sizes": "1280x800", "type": "image/jpeg", "form_factor": "wide", "label": "Menú de Date Gusto en pantalla ancha" }
+  ]
+}
